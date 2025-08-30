@@ -7,7 +7,7 @@ When you copy and paste content from Gemini's web interface, all of the formatti
 Features
 One-Step Copy: Use a single, intuitive keyboard shortcut to copy the entire last response.
 
-Perfect Markdown: Converts HTML formatting (like <h1>, <ul>) back into clean Markdown syntax (#, *).
+Perfect Markdown: Converts HTML formatting (like h1, ul) back into clean Markdown syntax (#, *).
 
 Intelligent Code Blocks: Automatically detects code blocks and converts them with the correct language name for proper syntax highlighting.
 
