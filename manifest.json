@@ -1,0 +1,30 @@
+{
+    "manifest_version": 3,
+    "name": "Gemini Last Message Copy",
+    "version": "1.0",
+    "description": "Adds a custom keyboard shortcut to copy the last response from Gemini.",
+    "permissions": [
+        "scripting",
+        "clipboardWrite"
+    ],
+    "host_permissions": [
+        "https://gemini.google.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "commands": {
+        "copy_last_response": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+C",
+                "mac": "Ctrl+Shift+C"
+            },
+            "description": "Copies the last Gemini response."
+        }
+    },
+    "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }
+}
