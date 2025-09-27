@@ -6,7 +6,7 @@ chrome.commands.onCommand.addListener((command) => {
 
             chrome.scripting.executeScript({
                 target: { tabId: tabId },
-                files: ["turndown.js"], // Loads the Turndown library first
+                files: ["turndown.js", "turndown-plugin-gfm.js"], // Loads the Turndown library first
             }, () => {
                 chrome.scripting.executeScript({
                     target: { tabId: tabId },
@@ -72,6 +72,10 @@ function copyHtmlAsMarkdown() {
             const lastResponse = allMessages[allMessages.length - 1];
 
             const turndownService = new TurndownService();
+
+             // 2. GFM 플러그인 사용 선언 (테이블 변환을 위해 필수)
+            turndownService.use(turndownPluginGfm.gfm);
+
             turndownService.addRule('codeBlock', {
                 filter: ['pre'],
                 replacement: function (content, node) {
