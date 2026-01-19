@@ -31,6 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -
 
+## [1.2.0]
+
+### Changed
+
+- remove redundant blanks and line break
+
 ## [1.1.0] 
 
 ### Fixed
