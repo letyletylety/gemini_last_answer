@@ -1,27 +1,43 @@
-Gemini Markdown Copy
-A simple and powerful Chrome extension that provides a keyboard shortcut to instantly copy Gemini's responses with clean, perfect Markdown formatting.
+🚀 Gemini Copy & Notify (v2.0.0)
 
-The Problem
-When you copy and paste content from Gemini's web interface, all of the formatting—like headings, bullet points, and code blocks—is lost. You are left with plain, unformatted text that requires manual reformatting. This extension solves that problem by preserving the original Markdown.
+"The Ultimate Tool to Complete Your Gemini Experience" Gemini Copy & Notify Pro revolutionizes your AI workflow with precise Markdown conversion and customizable notification sounds. Stop waiting for the response to finish—listen for the chime and copy perfectly with one click.
 
-Features
-One-Step Copy: Use a single, intuitive keyboard shortcut to copy the entire last response.
+✨ What's New in v2.0.0
 
-Perfect Markdown: Converts HTML formatting (like h1, ul) back into clean Markdown syntax (#, *).
+🎵 Emotional & Smart Sound Engine
 
-Intelligent Code Blocks: Automatically detects code blocks and converts them with the correct language name for proper syntax highlighting.
+Custom Waveforms: Choose between Sine (soothing), Triangle (clear), or Square (bold) waves.
 
-Visual Feedback: A subtle pop-up in the bottom-left corner confirms a successful copy operation.
+Premium Reverb System: No more robotic beeps. Experience a high-quality reverb effect that fades out smoothly, just like professional audio gear.
 
-How to Install
+Background Detection: Work in other tabs or minimize your browser with confidence. We'll notify you the instant Gemini finishes its response.
 
-1. [Chrome Web Store](https://chromewebstore.google.com/detail/gemini-last-message-copy/hgffjkapejehipfncokealmclfnlkobb)
-2. Move to **Manage Extensions** - **Keyboard shortcuts**, then set up the copy shortcut.
+⚙️ User-Centric Precision Tuning
 
-Usage
-Open Gemini and chat as you normally would.
+Intuitive Options Page: Adjust Volume (0.0 – 1.0) and Pitch (Hz) in real-time. Test your settings instantly to find your 'Golden Sound'.
 
-The Markdown-formatted response is now on your clipboard, ready to paste anywhere you need it.
+🚀 Key Features
 
-Permissions Justification
-This extension requires a few permissions to function. We are committed to your privacy and security. This extension doesn't use any external server. All tasks are computed in your browser.
+🏆 Smart Markdown Copy: Powered by the GFM (GitHub Flavored Markdown) plugin! Convert complex tables, formulas, and code blocks into clean, ready-to-use Markdown.
+
+💻 Developer Optimized: Automatically detects and inserts programming language tags into code blocks for seamless pasting.
+
+🎧 Optimized Defaults: Start with the most comfortable settings—Smooth Sine wave at 0.15 volume.
+
+🛠 Installation & Usage
+
+Install: Go to chrome://extensions, and enable Developer mode in the top right.
+
+Load: Click 'Load unpacked' and select the extension folder.
+
+Setup: Right-click the extension icon -> 'Options' to customize your notification.
+
+Copy: Once Gemini finishes, press Ctrl + Shift + C to save the response to your clipboard as Markdown.
+
+📄 License & Privacy
+
+This project is open-source under the MIT License.
+
+Privacy First: Your conversations and data are never sent to external servers. Everything is processed locally within your browser.
+
+Developed with ❤️ for the Global Gemini Community

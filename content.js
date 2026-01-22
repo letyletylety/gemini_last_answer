@@ -1,58 +1,97 @@
 /**
- * Gemini 응답 완료 감지 및 알림음 재생
+ * Gemini Content Script - Sound Notification & Copy Logic
+ * Includes defensive checks for chrome.storage to prevent crashes
  */
 
 let isGenerating = false;
 
-// 별도의 파일 없이 코드로 소리를 생성하는 함수 (Web Audio API)
-function playBeep() {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+// Defensive storage access
+function getSettings(callback) {
+  const defaultSettings = {
+    enableSound: true,
+    soundType: 'triangle',
+    volume: 0.15,
+    frequency: 720
+  };
 
-    oscillator.type = 'sine'; // 부드러운 사인파
-    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // 주파수 (A5 음)
-    
-    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.05); // 서서히 커짐
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); // 서서히 사라짐
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.5);
-    
-    console.log("Gemini: 응답 완료 알림음 재생됨");
-  } catch (e) {
-    console.error("알림음 재생 실패:", e);
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+    chrome.storage.sync.get(defaultSettings, (items) => {
+      if (chrome.runtime.lastError) {
+        callback(defaultSettings);
+      } else {
+        callback(items);
+      }
+    });
+  } else {
+    // If context is lost or storage unavailable, use defaults
+    callback(defaultSettings);
   }
 }
 
-// Gemini 화면 변화를 감시하여 응답 상태 확인
-function startObserving() {
-  const observer = new MutationObserver(() => {
-    // '중지' 또는 'Stop' 버튼이 있으면 답변 생성 중임
-    // 구글이 UI를 바꿔도 대응할 수 있도록 여러 속성 확인
-    const stopButton = document.querySelector('button[aria-label*="Stop"], button[aria-label*="중지"], .stop-generating-button');
-    
-    if (stopButton && !isGenerating) {
-      // 생성이 시작되는 시점
-      isGenerating = true;
-    } else if (!stopButton && isGenerating) {
-      // 생성이 끝나는 시점 (버튼이 사라짐)
-      isGenerating = false;
-      playBeep();
-    }
-  });
+async function playNotification() {
+  getSettings(async (settings) => {
+    if (!settings.enableSound) return;
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = settings.soundType;
+      oscillator.frequency.setValueAtTime(parseFloat(settings.frequency), audioCtx.currentTime);
+      
+      const vol = parseFloat(settings.volume);
+      const now = audioCtx.currentTime;
+      
+      // Beep 1
+      gainNode.gain.setValueAtTime(0, now);
+      gainNode.gain.linearRampToValueAtTime(vol, now + 0.02);
+      gainNode.gain.linearRampToValueAtTime(vol, now + 0.1);
+      gainNode.gain.linearRampToValueAtTime(0, now + 0.15);
+      
+      // Beep 2 (Reverb)
+      const secondStart = now + 0.2;
+      gainNode.gain.setValueAtTime(0, secondStart);
+      gainNode.gain.linearRampToValueAtTime(vol, secondStart + 0.02);
+      gainNode.gain.linearRampToValueAtTime(vol, secondStart + 0.3);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, secondStart + 1.5);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(secondStart + 1.6);
+    } catch (e) {
+      console.warn("Sound play failed (Interaction required?):", e);
+    }
   });
 }
 
-// 초기 로드 시 실행
-console.log("Gemini Copy & Notify: 알림 기능 활성화됨");
-startObserving();
+function observeGemini() {
+  const observer = new MutationObserver(() => {
+    // Check if extension context is still valid
+    if (typeof chrome === 'undefined' || !chrome.runtime?.id) {
+      observer.disconnect();
+      return;
+    }
+
+    const stopButton = document.querySelector('button[aria-label*="Stop"], button[aria-label*="중지"], .stop-generating-button');
+    
+    if (stopButton && !isGenerating) {
+      isGenerating = true;
+    } else if (!stopButton && isGenerating) {
+      isGenerating = false;
+      setTimeout(playNotification, 300);
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Start only if context is valid
+if (typeof chrome !== 'undefined' && chrome.runtime?.id) {
+  console.log("Gemini Copy & Notify script active.");
+  observeGemini();
+}

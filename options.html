@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemini Copy & Notify Settings</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #333; background-color: #f4f7f9; max-width: 500px; margin: auto; }
+    h1 { color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; font-size: 1.5rem; margin-top: 0; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; margin-top: 20px; }
+    .setting-group { margin-bottom: 20px; }
+    label { font-weight: 600; display: block; margin-bottom: 8px; font-size: 0.95rem; }
+    .row { display: flex; align-items: center; justify-content: space-between; }
+    input[type="range"] { width: 100%; cursor: pointer; margin-top: 10px; }
+    select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; background: white; font-size: 1rem; }
+    .btn-group { display: flex; gap: 10px; margin-top: 25px; }
+    button { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: all 0.2s; }
+    #testSound { background-color: #f1f3f4; color: #3c4043; border: 1px solid #dadce0; }
+    #testSound:hover { background-color: #e8eaed; }
+    #save { background-color: #1a73e8; color: white; }
+    #save:hover { background-color: #1765cc; }
+    .status-msg { text-align: center; margin-top: 15px; font-size: 0.9rem; min-height: 1.2rem; font-weight: bold; }
+    .success { color: #1e8e3e; }
+    .error { color: #d93025; }
+    .value-label { color: #1a73e8; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>알림 설정</h1>
+  
+  <div class="card">
+    <div class="setting-group">
+      <div class="row">
+        <label for="enableSound">알림음 활성화</label>
+        <input type="checkbox" id="enableSound" checked>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <label for="soundType">소리 종류</label>
+      <select id="soundType">
+        <option value="sine">부드러움 (Sine)</option>
+        <option value="triangle">보통 (Triangle)</option>
+        <option value="square" selected>강력함 (Square)</option>
+      </select>
+    </div>
+
+    <div class="setting-group">
+      <label for="volume">볼륨: <span id="volValue" class="value-label">0.4</span></label>
+      <input type="range" id="volume" min="0" max="1.0" step="0.05" value="0.4">
+    </div>
+
+    <div class="setting-group">
+      <label for="frequency">음 높이: <span id="freqValue" class="value-label">880</span>Hz</label>
+      <input type="range" id="frequency" min="200" max="2000" step="10" value="880">
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button id="testSound">🔔 소리 테스트</button>
+    <button id="save">설정 저장하기</button>
+  </div>
+
+  <div id="status" class="status-msg"></div>
+
+  <!-- 중요: 스크립트 파일을 본문 끝에 배치하여 DOM 로드 후 실행 보장 -->
+  <script src="options.js"></script>
+</body>
+</html>

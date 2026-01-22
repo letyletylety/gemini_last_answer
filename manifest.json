@@ -1,17 +1,22 @@
 {
     "manifest_version": 3,
     "name": "Gemini Copy & Notify",
-    "version": "1.3",
+    "version": "2.0.0",
     "description": "Gemini 응답을 마크다운으로 복사하고, 완료 시 알림음을 재생합니다.",
     "permissions": [
         "scripting",
-        "clipboardWrite"
+        "clipboardWrite",
+        "storage"
     ],
     "host_permissions": [
         "https://gemini.google.com/*"
     ],
     "background": {
         "service_worker": "background.js"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
     },
     "content_scripts": [
         {
