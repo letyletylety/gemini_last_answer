@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Gemini Last Message Copy",
+    "name": "Gemini Copy & Notify",
     "version": "1.2",
-    "description": "Adds a custom keyboard shortcut to copy the last response from Gemini.",
+    "description": "Gemini 응답을 마크다운으로 복사하고, 완료 시 알림음을 재생합니다.",
     "permissions": [
         "scripting",
         "clipboardWrite"
@@ -13,13 +13,23 @@
     "background": {
         "service_worker": "background.js"
     },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://gemini.google.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
     "commands": {
         "copy_last_response": {
             "suggested_key": {
                 "default": "Ctrl+Shift+C",
                 "mac": "Ctrl+Shift+C"
             },
-            "description": "Copies the last Gemini response."
+            "description": "Copy last gemini's response"
         }
     },
     "web_accessible_resources": [
