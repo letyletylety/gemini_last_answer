@@ -1,8 +1,10 @@
-🚀 Gemini Copy & Notify (v2.0.0)
+🚀 Gemini Copy & Notify (v2.1.0)
 
 "The Ultimate Tool to Complete Your Gemini Experience" Gemini Copy & Notify Pro revolutionizes your AI workflow with precise Markdown conversion and customizable notification sounds. Stop waiting for the response to finish—listen for the chime and copy perfectly with one click.
 
-✨ What's New in v2.0.0
+✨ What's New in v2.1.0
+
+📐 LaTeX Math Formulas & SVG Support: Perfect preservation of complex math formulas (`$...$` / `$$...$$`) and clean SVG diagram handling without UI clutter.
 
 🎵 Emotional & Smart Sound Engine
 

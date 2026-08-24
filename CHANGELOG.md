@@ -5,31 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0]
 
 ### Added
 
--
-
-### Changed
-
--
-
-### Deprecated
-
--
-
-### Removed
-
--
+- Support LaTeX math formulas (KaTeX, MathML, MathJax) conversion to `$inline$` and `$$block$$`.
+- Support standalone SVG diagram preservation as code blocks.
+- Enhanced code block detection for modern Gemini web components (`<code-block>`, `<spark-code-block>`).
+- Clipboard fallback mechanism using temporary textarea execution.
 
 ### Fixed
 
--
+- Removed UI button texts (copy buttons, feedback, audio) and UI SVG icons from copied markdown.
+- Fixed character escaping issues in LaTeX formulas.
 
-### Security
+## [2.0.0]
 
--
+### Added
+
+- Emotional & Smart Sound Engine with custom waveforms (Sine, Triangle, Square).
+- Reverb audio system and background detection.
+- Options page for volume and pitch tuning.
 
 ## [1.3.0]
 
