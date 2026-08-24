@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Gemini Copy & Notify",
-    "version": "2.1.0",
-    "description": "Gemini 응답을 마크다운으로 복사하고, 완료 시 알림음을 재생합니다.",
+    "name": "Gemini Copy",
+    "version": "2.1.1",
+    "description": "Gemini 답변을 LaTeX 수식과 마크다운으로 깔끔하게 복사하고, 완료 알림음을 제공합니다.",
     "permissions": [
         "scripting",
         "clipboardWrite",
