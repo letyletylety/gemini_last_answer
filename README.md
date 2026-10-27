@@ -1,8 +1,12 @@
-🚀 Gemini Copy (v2.1.1)
+🚀 Gemini Copy (v2.1.2)
 
 "The Ultimate Tool to Complete Your Gemini Experience" Gemini Copy revolutionizes your AI workflow with precise Markdown conversion, flawless LaTeX math support, and customizable notification sounds. Stop waiting for the response to finish—listen for the chime and copy perfectly with one click.
 
-✨ What's New in v2.1.1
+✨ What's New in v2.1.2
+
+📊 Flawless GFM Table Conversion: Perfect preservation of complex multi-line tables with lists (`•`), paragraphs (`<p>`), and line breaks without row disintegration. Automatically escapes internal pipes (`\|`) and filters out empty spacer rows.
+
+🧪 Interactive & CLI Test Suites: Built-in visual test dashboard (`test_runner.html`) and regression test script (`test_table.js`) to guarantee table formatting stability.
 
 📐 LaTeX Math Formulas & SVG Support: Perfect preservation of complex math formulas (`$...$` / `$$...$$`) and clean SVG diagram handling without UI clutter.
 

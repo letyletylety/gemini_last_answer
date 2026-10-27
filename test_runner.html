@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Copy - GFM Table Conversion Test Suite</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --pass: #10b981;
+      --pass-bg: rgba(16, 185, 129, 0.1);
+      --fail: #ef4444;
+      --fail-bg: rgba(239, 68, 68, 0.1);
+      --code-bg: #020617;
+      --accent: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 24px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .summary-card {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .stat-box .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .stat-box .value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .stat-box.pass .value { color: var(--pass); }
+    .stat-box.fail .value { color: var(--fail); }
+    .stat-box.total .value { color: var(--accent); }
+
+    .test-case {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .test-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .test-header:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .test-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.pass {
+      background: var(--pass-bg);
+      color: var(--pass);
+      border: 1px solid var(--pass);
+    }
+
+    .badge.fail {
+      background: var(--fail-bg);
+      color: var(--fail);
+      border: 1px solid var(--fail);
+    }
+
+    .test-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .test-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    .test-duration {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .test-body {
+      padding: 0 20px 20px 20px;
+      border-top: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .code-panel {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .code-panel label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12.5px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      flex: 1;
+      max-height: 280px;
+    }
+
+    .error-msg {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: var(--fail-bg);
+      border: 1px solid var(--fail);
+      border-radius: 8px;
+      color: #fca5a5;
+      font-size: 13px;
+      font-family: monospace;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    button.btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button.btn:hover {
+      background: #1d4ed8;
+    }
+
+    .live-test-area {
+      margin-top: 40px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .live-test-area h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 13px;
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+  </style>
+
+  <!-- Turndown 및 GFM 플러그인 로드 -->
+  <script src="turndown.js"></script>
+  <script src="turndown-plugin-gfm.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧪 Gemini Copy - GFM Table Test Suite</h1>
+      <p class="subtitle">테이블 셀 내 멀티라인(목록, 문단), 파이프 이스케이프, 빈 행 제거 및 GFM 표준 호환성 테스트</p>
+    </header>
+
+    <div class="summary-card">
+      <div class="stat-box total">
+        <div class="label">총 테스트</div>
+        <div class="value" id="total-count">0</div>
+      </div>
+      <div class="stat-box pass">
+        <div class="label">성공 (PASS)</div>
+        <div class="value" id="pass-count">0</div>
+      </div>
+      <div class="stat-box fail">
+        <div class="label">실패 (FAIL)</div>
+        <div class="value" id="fail-count">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">총 소요 시간</div>
+        <div class="value" id="total-time">0ms</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="runAllTests()">🔄 테스트 재실행</button>
+    </div>
+
+    <div id="test-results"></div>
+
+    <div class="live-test-area">
+      <h2>🔍 실시간 HTML 변환 플레이그라운드</h2>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Gemini에서 복사한 테이블 HTML을 직접 입력하여 마크다운 변환 결과를 테스트해보세요.</p>
+      <textarea id="live-input" placeholder="<table>...</table> HTML 코드를 여기에 붙여넣으세요..."></textarea>
+      <button class="btn" onclick="runLiveTest()">마크다운 변환 테스트</button>
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="code-panel">
+          <label>마크다운 결과</label>
+          <pre id="live-output"></pre>
+        </div>
+        <div class="code-panel">
+          <label>검증 결과 (GFM 테이블 규칙 충족 여부)</label>
+          <pre id="live-validation"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Turndown 인스턴스 생성 (content.js와 동일한 설정)
+    function createService() {
+      const service = new TurndownService({
+        headingStyle: 'atx',
+        codeBlockStyle: 'fenced',
+        bulletListMarker: '-',
+        blankReplacement: (content, node) => (node.isBlock ? '\n\n' : '')
+      });
+      service.escape = (str) => str; // 수식 및 특수문자 보존
+
+      const gfmPlugin = typeof turndownPluginGfm !== 'undefined' ? turndownPluginGfm.gfm : window.turndownPluginGfm?.gfm;
+      if (gfmPlugin) {
+        service.use(gfmPlugin);
+      }
+      return service;
+    }
+
+    // 마크다운 테이블 유효성 검증 함수
+    function validateMarkdownTable(markdown, expectedRowCount, expectedColCount) {
+      const lines = markdown.trim().split('\n').filter(l => l.trim().length > 0);
+      
+      if (lines.length < 2) {
+        return { valid: false, reason: `테이블 행 수가 부족합니다 (헤더 + 구분선 포함 최소 2행 필요, 실제: ${lines.length}행)` };
+      }
+
+      // 1. 헤더 구분선 확인 (| --- | --- |)
+      const separatorLine = lines[1];
+      if (!/^\|(\s*:?-+:?\s*\|)+$/.test(separatorLine.trim())) {
+        return { valid: false, reason: `2번째 줄이 올바른 GFM 구분선이 아닙니다: "${separatorLine}"` };
+      }
+
+      // 2. 모든 행이 단일 라인이고 컬럼 수가 일치하는지 검증
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line.startsWith('|') || !line.endsWith('|')) {
+          return { valid: false, reason: `${i + 1}번째 줄이 '|'로 시작하거나 끝나지 않습니다: "${line.substring(0, 40)}..."` };
+        }
+
+        // 셀 개수 카운트 (이스케이프된 \| 제외)
+        const unescapedPipes = (line.match(/(?<!\\)\|/g) || []).length;
+        const colCount = unescapedPipes - 1;
+
+        if (expectedColCount !== undefined && colCount !== expectedColCount) {
+          return { valid: false, reason: `${i + 1}번째 줄의 컬럼 수가 예상치와 다릅니다 (예상: ${expectedColCount}, 실제: ${colCount})` };
+        }
+      }
+
+      // 3. 기대 행 수 검증 (헤더 + 구분선 + 데이터 행)
+      if (expectedRowCount !== undefined && lines.length !== expectedRowCount) {
+        return { valid: false, reason: `총 행 수가 일치하지 않습니다 (예상: ${expectedRowCount}, 실제: ${lines.length})` };
+      }
+
+      return { valid: true, colCount: (lines[0].match(/(?<!\\)\|/g) || []).length - 1, rowCount: lines.length };
+    }
+
+    // 테스트 케이스 정의
+    const testCases = [
+      {
+        id: 'tc1-multiline-paragraphs',
+        title: '셀 내 복수 문단(<p>) 처리',
+        desc: '셀 내부의 <p> 태그들이 줄바꿈(\\n) 대신 <br>로 변환되어 단일 행을 유지하는지 검증',
+        html: `<table>
+          <thead>
+            <tr><th>권역</th><th>정보</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p><strong>영미권 (40%)</strong></p><p>12편</p></td>
+              <td><p>대표 문학</p><p>19세기 고전</p></td>
+            </tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          const v = validateMarkdownTable(md, 3, 2);
+          if (!v.valid) throw new Error(v.reason);
+          if (!md.includes('**영미권 (40%)**<br>12편')) throw new Error('<p> 태그 간격이 <br>로 연결되지 않았습니다.');
+          if (!md.includes('대표 문학<br>19세기 고전')) throw new Error('데이터 셀의 <p> 태그가 <br>로 변환되지 않았습니다.');
+        }
+      },
+      {
+        id: 'tc2-bullet-list',
+        title: '셀 내 글머리 기호 목록(<ul><li>) 처리',
+        desc: '셀 내부의 리스트 아이템들이 테이블 행을 파괴하지 않고 <br>로 연결되는지 검증',
+        html: `<table>
+          <thead>
+            <tr><th>작가</th><th>작품 목록</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>에드거 앨런 포</td>
+              <td>
+                <ul>
+                  <li>갈가마귀 (The Raven)</li>
+                  <li>애너벨 리 (Annabel Lee)</li>
+                  <li>어셔가의 몰락</li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          const v = validateMarkdownTable(md, 3, 2);
+          if (!v.valid) throw new Error(v.reason);
+          if (!md.includes('갈가마귀 (The Raven)<br>')) throw new Error('리스트 항목 사이가 <br>로 개행되지 않았습니다.');
+          if (!md.includes('애너벨 리 (Annabel Lee)')) throw new Error('리스트 내용이 누락되었습니다.');
+        }
+      },
+      {
+        id: 'tc3-pipe-escaping',
+        title: '셀 내용 안의 파이프(|) 기호 이스케이프',
+        desc: '셀 텍스트에 포함된 파이프 문자(|)가 \\|로 이스케이프되어 가짜 컬럼이 생기지 않는지 검증',
+        html: `<table>
+          <thead>
+            <tr><th>식별자</th><th>설명 | 세부사항</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A | B</td>
+              <td>포 | 디킨슨 | 프로스트</td>
+            </tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          const v = validateMarkdownTable(md, 3, 2);
+          if (!v.valid) throw new Error(v.reason);
+          if (!md.includes('A \\| B')) throw new Error('셀 내부 파이프가 \\| 로 이스케이프되지 않았습니다.');
+          if (!md.includes('포 \\| 디킨슨 \\| 프로스트')) throw new Error('데이터 내부 복수 파이프가 이스케이프되지 않았습니다.');
+        }
+      },
+      {
+        id: 'tc4-empty-spacer-row',
+        title: '빈 행(Spacer row / Empty tr) 필터링',
+        desc: 'Gemini가 가끔 출력하는 빈 <tr><td></td></tr> spacer 행이 깔끔하게 걸러지는지 검증',
+        html: `<table>
+          <thead>
+            <tr><th>구분</th><th>값</th></tr>
+          </thead>
+          <tbody>
+            <tr><td></td><td></td></tr>
+            <tr><td>항목 1</td><td>값 1</td></tr>
+            <tr><td>   </td><td>   </td></tr>
+            <tr><td>항목 2</td><td>값 2</td></tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          // 헤더(1) + 구분선(1) + 실제 데이터 행(2) = 총 4행이어야 함 (빈 행 2개는 제거)
+          const v = validateMarkdownTable(md, 4, 2);
+          if (!v.valid) throw new Error(v.reason);
+          if (md.includes('|     |') || md.includes('|\n|  |')) throw new Error('공백 행이 마크다운에 그대로 출력되었습니다.');
+        }
+      },
+      {
+        id: 'tc5-text-alignment',
+        title: '텍스트 정렬(align=center/right) 보존',
+        desc: 'th/td의 align 속성이 GFM 정렬 문법(:---:, ---:)으로 올바르게 반영되는지 검증',
+        html: `<table>
+          <thead>
+            <tr>
+              <th align="left">좌측</th>
+              <th align="center">중앙</th>
+              <th align="right">우측</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td align="left">L</td>
+              <td align="center">C</td>
+              <td align="right">R</td>
+            </tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          const v = validateMarkdownTable(md, 3, 3);
+          if (!v.valid) throw new Error(v.reason);
+          const lines = md.trim().split('\n');
+          const sep = lines[1];
+          if (!sep.includes(':--') || !sep.includes(':-:') || !sep.includes('--:')) {
+            throw new Error(`정렬 구분자가 올바르지 않습니다: ${sep}`);
+          }
+        }
+      },
+      {
+        id: 'tc6-real-world-user-case',
+        title: '사용자 실제 케이스 (유화 30선 및 명시 30선 표)',
+        desc: '사용자가 질문에 올려준 실제 3개 권역(영미권, 유럽, 아시아)의 복합 멀티라인 표 완벽 변환 검증',
+        html: `<table>
+          <thead>
+            <tr>
+              <th>권역 (비중)</th>
+              <th>대표 작가 및 작품 (전 세계 인지도 최상위 & 퍼블릭 도메인)</th>
+              <th>매칭할 기존 유화 에셋 (\`bg_*.webp\`)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><p><strong>영미권 (40%)</strong></p><p>12편</p></td>
+              <td>
+                <p>• <strong>에드거 앨런 포</strong> · 『갈가마귀 (The Raven) / 애너벨 리』</p>
+                <p>• <strong>에밀리 디킨슨</strong> · 『고독과 밤의 시선 (Hope is the thing with feathers 외)』</p>
+                <p>• <strong>로버트 프로스트</strong> · 『가지 않은 길 / 눈 내리는 저녁 숲가에 멈춰 서서』</p>
+              </td>
+              <td>
+                <p><code>bg_poe_telltale_heart</code></p>
+                <p><code>bg_gilman_yellow_wallpaper</code></p>
+                <p><code>bg_gogol_the_overcoat</code></p>
+              </td>
+            </tr>
+            <tr>
+              <td><p><strong>유럽 대륙 (30%)</strong></p><p>9편</p></td>
+              <td>
+                <p>• <strong>샤를 보들레르 (프랑스)</strong> · 『악의 꽃 (우울과 이상)』</p>
+                <p>• <strong>아르튀르 랭보 (프랑스)</strong> · 『지옥에서 보낸 한 철 / 취한 배』</p>
+              </td>
+              <td>
+                <p><code>bg_mann_death_in_venice</code></p>
+                <p><code>bg_saint_exupery_night_flight</code></p>
+              </td>
+            </tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          // 헤더(1) + 구분선(1) + 데이터행(2) = 4행, 각 3컬럼
+          const v = validateMarkdownTable(md, 4, 3);
+          if (!v.valid) throw new Error(v.reason);
+          const lines = md.trim().split('\n');
+          // 각 행이 한 줄에 완전히 담겨있는지 확인
+          lines.forEach((line, idx) => {
+            if (!line.startsWith('|') || !line.endsWith('|')) {
+              throw new Error(`행 ${idx + 1}이 분리되어 깨져 있습니다: ${line}`);
+            }
+          });
+          if (!md.includes('bg_poe_telltale_heart`<br>`bg_gilman_yellow_wallpaper')) {
+            throw new Error('코드 블록 에셋 간의 <br> 연결이 올바르지 않습니다.');
+          }
+        }
+      },
+      {
+        id: 'tc7-table-without-thead',
+        title: 'thead 없는 table Fallback 처리',
+        desc: 'Gemini가 thead/th 없이 일반 tbody>tr>td로만 테이블을 생성했을 때도 마크다운 표로 변환되는지 검증',
+        html: `<table>
+          <tbody>
+            <tr><td>헤더 1</td><td>헤더 2</td></tr>
+            <tr><td>데이터 A</td><td>데이터 B</td></tr>
+          </tbody>
+        </table>`,
+        assert: (md) => {
+          const v = validateMarkdownTable(md, 3, 2);
+          if (!v.valid) throw new Error(v.reason);
+          if (md.includes('<table') || md.includes('<tbody>')) {
+            throw new Error('테이블이 마크다운으로 변환되지 않고 HTML로 남았습니다.');
+          }
+        }
+      }
+    ];
+
+    function runAllTests() {
+      const resultsDiv = document.getElementById('test-results');
+      resultsDiv.innerHTML = '';
+
+      let passCount = 0;
+      let failCount = 0;
+      const startTime = performance.now();
+      const service = createService();
+
+      testCases.forEach((tc) => {
+        const testStart = performance.now();
+        let pass = false;
+        let output = '';
+        let error = null;
+
+        try {
+          output = service.turndown(tc.html);
+          tc.assert(output);
+          pass = true;
+          passCount++;
+        } catch (err) {
+          pass = false;
+          failCount++;
+          error = err;
+        }
+
+        const duration = (performance.now() - testStart).toFixed(2);
+
+        const card = document.createElement('div');
+        card.className = 'test-case';
+        card.innerHTML = `
+          <div class="test-header" onclick="toggleDetails('${tc.id}')">
+            <div class="test-title-group">
+              <span class="badge ${pass ? 'pass' : 'fail'}">${pass ? 'PASS' : 'FAIL'}</span>
+              <div>
+                <span class="test-name">${tc.title}</span>
+                <span class="test-desc">${tc.desc}</span>
+              </div>
+            </div>
+            <div class="test-duration">${duration}ms</div>
+          </div>
+          <div class="test-body" id="${tc.id}" style="display: ${pass ? 'none' : 'block'};">
+            ${error ? `<div class="error-msg">⚠️ Assertion Failed: ${error.message}</div>` : ''}
+            <div class="grid-2">
+              <div class="code-panel">
+                <label>입력 HTML</label>
+                <pre>${escapeHtml(tc.html.trim())}</pre>
+              </div>
+              <div class="code-panel">
+                <label>변환된 마크다운 결과</label>
+                <pre>${escapeHtml(output || '(변환 실패)')}</pre>
+              </div>
+            </div>
+          </div>
+        `;
+        resultsDiv.appendChild(card);
+      });
+
+      const totalDuration = (performance.now() - startTime).toFixed(1);
+      document.getElementById('total-count').textContent = testCases.length;
+      document.getElementById('pass-count').textContent = passCount;
+      document.getElementById('fail-count').textContent = failCount;
+      document.getElementById('total-time').textContent = `${totalDuration}ms`;
+    }
+
+    function toggleDetails(id) {
+      const body = document.getElementById(id);
+      if (body) {
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function runLiveTest() {
+      const input = document.getElementById('live-input').value;
+      if (!input.trim()) return;
+
+      const service = createService();
+      try {
+        const md = service.turndown(input);
+        document.getElementById('live-output').textContent = md;
+
+        const val = validateMarkdownTable(md);
+        if (val.valid) {
+          document.getElementById('live-validation').textContent = `✅ 유효한 GFM 마크다운 테이블입니다!\n- 감지된 행 수: ${val.rowCount}행\n- 컬럼 수: ${val.colCount}열\n- 모든 셀의 개행이 올바르게 캡슐화되었습니다.`;
+        } else {
+          document.getElementById('live-validation').textContent = `❌ 유효성 검증 실패: ${val.reason}`;
+        }
+      } catch (err) {
+        document.getElementById('live-output').textContent = '에러: ' + err.message;
+        document.getElementById('live-validation').textContent = '변환 실패';
+      }
+    }
+
+    // 초기 자동 실행
+    window.addEventListener('DOMContentLoaded', () => {
+      runAllTests();
+    });
+  </script>
+</body>
+</html>

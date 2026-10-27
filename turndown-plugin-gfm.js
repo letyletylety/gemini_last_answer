@@ -43,7 +43,11 @@ var rules = {};
 rules.tableCell = {
   filter: ['th', 'td'],
   replacement: function (content, node) {
-    return cell(content, node)
+    var cleanContent = content
+      .trim()
+      .replace(/(?<!\\)\|/g, '\\|')
+      .replace(/\r?\n+/g, '<br>');
+    return cell(cleanContent, node);
   }
 };
 
@@ -54,57 +58,73 @@ rules.tableRow = {
     var alignMap = { left: ':--', right: '--:', center: ':-:' };
 
     if (isHeadingRow(node)) {
-      for (var i = 0; i < node.childNodes.length; i++) {
+      var cells = Array.prototype.filter.call(node.childNodes, function (n) {
+        return n.nodeName === 'TH' || n.nodeName === 'TD';
+      });
+      for (var i = 0; i < cells.length; i++) {
         var border = '---';
         var align = (
-          node.childNodes[i].getAttribute('align') || ''
+          cells[i].getAttribute('align') || ''
         ).toLowerCase();
 
         if (align) border = alignMap[align] || border;
 
-        borderCells += cell(border, node.childNodes[i]);
+        borderCells += cell(border, cells[i]);
       }
     }
-    return '\n' + content + (borderCells ? '\n' + borderCells : '')
+
+    var trimmed = content.trim();
+    if (!trimmed || /^(\||\s)+$/.test(trimmed)) {
+      return borderCells ? '\n' + borderCells : '';
+    }
+
+    return '\n' + content + (borderCells ? '\n' + borderCells : '');
   }
 };
 
 rules.table = {
-  // Only convert tables with a heading row.
-  // Tables with no heading row are kept using `keep` (see below).
   filter: function (node) {
-    return node.nodeName === 'TABLE' && isHeadingRow(node.rows[0])
+    return node.nodeName === 'TABLE' && (isHeadingRow(node.rows[0]) || (node.rows && node.rows.length > 0));
   },
 
   replacement: function (content) {
-    // Ensure there are no blank lines
-    content = content.replace('\n\n', '\n');
-    return '\n\n' + content + '\n\n'
+    content = content
+      .split('\n')
+      .map(function (line) { return line.trim(); })
+      .filter(function (line) { return line.length > 0; })
+      .join('\n');
+    return '\n\n' + content + '\n\n';
   }
 };
 
 rules.tableSection = {
   filter: ['thead', 'tbody', 'tfoot'],
   replacement: function (content) {
-    return content
+    return content;
   }
 };
 
-// A tr is a heading row if:
-// - the parent is a THEAD
-// - or if its the first child of the TABLE or the first TBODY (possibly
-//   following a blank THEAD)
-// - and every cell is a TH
 function isHeadingRow (tr) {
+  if (!tr) return false;
   var parentNode = tr.parentNode;
-  return (
-    parentNode.nodeName === 'THEAD' ||
-    (
-      parentNode.firstChild === tr &&
-      (parentNode.nodeName === 'TABLE' || isFirstTbody(parentNode)) &&
-      every.call(tr.childNodes, function (n) { return n.nodeName === 'TH' })
-    )
-  )
+  if (parentNode.nodeName === 'THEAD') return true;
+  var cells = Array.prototype.filter.call(tr.childNodes, function (n) {
+    return n.nodeName === 'TH' || n.nodeName === 'TD';
+  });
+  if (cells.length > 0 && cells.every(function (n) { return n.nodeName === 'TH'; })) {
+    return true;
+  }
+  var table = tr.closest ? tr.closest('table') : null;
+  if (!table) {
+    var p = parentNode;
+    while (p && p.nodeName !== 'TABLE') p = p.parentNode;
+    table = p;
+  }
+  if (table && !table.querySelector('thead')) {
+    var firstTr = table.querySelector('tr');
+    if (firstTr === tr) return true;
+  }
+  return false;
 }
 
 function isFirstTbody (element) {
@@ -117,20 +137,21 @@ function isFirstTbody (element) {
         /^\s*$/i.test(previousSibling.textContent)
       )
     )
-  )
+  );
 }
 
 function cell (content, node) {
-  var index = indexOf.call(node.parentNode.childNodes, node);
+  var parent = node.parentNode;
+  var cells = Array.prototype.filter.call(parent.childNodes, function (n) {
+    return n.nodeName === 'TH' || n.nodeName === 'TD';
+  });
+  var index = indexOf.call(cells, node);
   var prefix = ' ';
   if (index === 0) prefix = '| ';
-  return prefix + content + ' |'
+  return prefix + content + ' |';
 }
 
 function tables (turndownService) {
-  turndownService.keep(function (node) {
-    return node.nodeName === 'TABLE' && !isHeadingRow(node.rows[0])
-  });
   for (var key in rules) turndownService.addRule(key, rules[key]);
 }
 

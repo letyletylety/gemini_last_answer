@@ -287,15 +287,15 @@ function copyHtmlAsMarkdown() {
 
       // 블록 수식 여부 판별 (디스플레이 클래스, 속성, 단독 p태그, multiline LaTeX 등)
       const isDisplay = node.classList.contains('katex-display') ||
-                        node.tagName === 'MATH-BLOCK' ||
-                        node.getAttribute('data-math-type') === 'block' ||
-                        node.getAttribute('display') === 'true' ||
-                        node.classList.contains('MathJax_Display') ||
-                        (node.parentElement && node.parentElement.childNodes.length === 1 && (node.parentElement.tagName === 'P' || node.parentElement.tagName === 'DIV')) ||
-                        latex.includes('\\begin{') ||
-                        latex.includes('\\\\');
+        node.tagName === 'MATH-BLOCK' ||
+        node.getAttribute('data-math-type') === 'block' ||
+        node.getAttribute('display') === 'true' ||
+        node.classList.contains('MathJax_Display') ||
+        (node.parentElement && node.parentElement.childNodes.length === 1 && (node.parentElement.tagName === 'P' || node.parentElement.tagName === 'DIV')) ||
+        latex.includes('\\begin{') ||
+        latex.includes('\\\\');
 
-      const replacementText = isDisplay 
+      const replacementText = isDisplay
         ? `\n\n$$\n${latex.trim()}\n$$\n\n`
         : ` $${latex.trim()}$ `;
 
@@ -310,11 +310,11 @@ function copyHtmlAsMarkdown() {
     const svgElements = Array.from(clone.querySelectorAll('svg'));
     svgElements.forEach(svg => {
       if (svg.closest('pre, code-block, spark-code-block, code')) return;
-      
-      const isSmallIcon = (svg.clientWidth > 0 && svg.clientWidth <= 32) || 
-                          (svg.getAttribute('width') && parseInt(svg.getAttribute('width')) <= 32) ||
-                          svg.classList.contains('icon') || svg.classList.contains('symbol') ||
-                          svg.closest('button, [role="button"], .button-container');
+
+      const isSmallIcon = (svg.clientWidth > 0 && svg.clientWidth <= 32) ||
+        (svg.getAttribute('width') && parseInt(svg.getAttribute('width')) <= 32) ||
+        svg.classList.contains('icon') || svg.classList.contains('symbol') ||
+        svg.closest('button, [role="button"], .button-container');
       if (isSmallIcon) {
         svg.remove();
       } else {
@@ -344,11 +344,11 @@ function copyHtmlAsMarkdown() {
 
     turndownService.addRule('codeBlock', {
       filter: (node) => {
-        return node.nodeName === 'PRE' || 
-               node.nodeName === 'CODE-BLOCK' || 
-               node.nodeName === 'SPARK-CODE-BLOCK' ||
-               node.classList?.contains('code-block') ||
-               node.classList?.contains('formatted-code-block-internal-container');
+        return node.nodeName === 'PRE' ||
+          node.nodeName === 'CODE-BLOCK' ||
+          node.nodeName === 'SPARK-CODE-BLOCK' ||
+          node.classList?.contains('code-block') ||
+          node.classList?.contains('formatted-code-block-internal-container');
       },
       replacement: (content, node) => {
         let lang = node.getAttribute('language') || node.getAttribute('data-language') || '';
@@ -380,7 +380,7 @@ function copyHtmlAsMarkdown() {
 
     // DOM 노드(clone)를 직접 Turndown에 전달하여 HTML 인코딩 파괴 방지
     let markdown = turndownService.turndown(clone);
-    
+
     // 수식 구분자 및 연속 줄바꿈 정제
     markdown = markdown
       .replace(/\\\[([\s\S]*?)\\\]/g, '\n\n$$$$\n$1\n$$$$\n\n') // \[ ... \] -> $$ ... $$
